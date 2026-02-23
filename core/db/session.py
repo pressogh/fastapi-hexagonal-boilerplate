@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import (
 from core.config import config
 
 # ContextVar to hold the session for each task/request
-session_context: ContextVar[str] = ContextVar("session_context")
+# Provide a safe default to avoid LookupError in unit-test contexts.
+session_context: ContextVar[str] = ContextVar("session_context", default="global")
 
 
 def get_session_context() -> str:
