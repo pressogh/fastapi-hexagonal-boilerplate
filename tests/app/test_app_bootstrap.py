@@ -1,6 +1,6 @@
-from app.main import create_app
 from core.config import config
 from core.fastapi import ExtendedFastAPI
+from main import create_app
 
 
 def test_create_app_returns_extended_fastapi():
