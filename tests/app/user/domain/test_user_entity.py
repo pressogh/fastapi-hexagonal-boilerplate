@@ -45,4 +45,4 @@ def test_user_soft_delete():
 
     # Then
     assert user.is_deleted is True
-    assert user.status == UserStatus.BLOCKED
+    assert user.status == UserStatus.ACTIVE

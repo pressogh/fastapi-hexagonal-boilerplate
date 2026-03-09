@@ -1,7 +1,10 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app.user.application.exceptions.user import UserEmailAlreadyExistsException
+from app.user.application.exceptions.user import (
+    UserEmailAlreadyExistsException,
+    UserNameAlreadyExistsException,
+)
 from app.user.application.service.user import UserService
 from main import create_app
 
@@ -41,6 +44,28 @@ def test_create_user_returns_serialized_id(client, monkeypatch):
     body = response.json()
     assert isinstance(body["data"]["id"], str)
     assert body["data"]["email"] == "test@example.com"
+
+
+def test_create_user_duplicate_username_returns_400(client, monkeypatch):
+    async def raise_duplicate_username(*_args, **_kwargs):
+        raise UserNameAlreadyExistsException()
+
+    monkeypatch.setattr(UserService, "create_user", raise_duplicate_username)
+
+    response = client.post(
+        "/api/users",
+        json={
+            "username": "duplicate_user",
+            "password": "secure_password123",
+            "email": "dup-user@example.com",
+            "nickname": "tester",
+            "real_name": "김테스트",
+            "phone_number": "010-1234-5678",
+        },
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error_code"] == "USER__USERNAME_ALREADY_EXISTS"
 
 
 def test_create_user_duplicate_email_returns_400(client, monkeypatch):
