@@ -1,9 +1,8 @@
 import pytest
-import pytest_asyncio
 
 from app.user.application.dto.request import CreateUserRequest
 from app.user.application.service.user import UserService
-from app.user.domain.entity.user import User, Profile
+from app.user.domain.entity.user import User
 from app.user.domain.repository.user import UserRepository
 
 
@@ -15,7 +14,7 @@ class InMemoryUserRepository(UserRepository):
         self.users[entity.email] = entity
         return entity
 
-    async def get_by_id(self, id):
+    async def get_by_id(self, _id):
         return None
 
     async def get_by_email(self, email: str):
@@ -65,5 +64,5 @@ async def test_create_user_duplicate_email():
 
     await service.create_user(req)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Email already registered"):
         await service.create_user(req)

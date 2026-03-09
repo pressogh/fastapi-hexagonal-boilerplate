@@ -3,10 +3,10 @@ from __future__ import annotations
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
+from alembic import context
 from core.config import config
 from core.db.sqlalchemy.models import file as file_model  # noqa: F401
 from core.db.sqlalchemy.models import user as user_model  # noqa: F401

@@ -1,15 +1,14 @@
 """Create initial tables
 
 Revision ID: e1ceb3bffcd2
-Revises: 
+Revises:
 Create Date: 2026-03-09 05:31:53.408452
 """
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
 
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'e1ceb3bffcd2'

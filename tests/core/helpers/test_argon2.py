@@ -1,4 +1,5 @@
 import pytest
+from argon2.exceptions import InvalidHashError
 
 from core.helpers.argon2 import Argon2Helper
 
@@ -45,5 +46,5 @@ def test_verify_with_invalid_hash():
     password = "password"
 
     # When & Then
-    with pytest.raises(Exception):  # Argon2 raises specific exceptions for malformed hashes
+    with pytest.raises(InvalidHashError):
         Argon2Helper.verify(password, invalid_hash)

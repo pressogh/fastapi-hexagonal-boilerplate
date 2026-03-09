@@ -1,4 +1,5 @@
 import pytest
+from jwt import DecodeError
 
 from core.domain.types import TokenType
 from core.helpers.token import TokenHelper
@@ -36,5 +37,5 @@ def test_refresh_token_creation_with_minutes():
 
 
 def test_decode_invalid_token():
-    with pytest.raises(Exception):
+    with pytest.raises(DecodeError):
         TokenHelper.decode_token("invalid.token")
