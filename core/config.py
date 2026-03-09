@@ -17,8 +17,8 @@ class Config(BaseSettings):
     APP_DESCRIPTION: str = "LLM 기반 외주 고도화 플랫폼 백엔드"
     APP_VERSION: str = "0.1.0"
     API_PREFIX: str = "/api"
-    DOCS_URL: str | None = "/docs"
-    REDOC_URL: str | None = "/redoc"
+    DOCS_URL: str | None = f"{API_PREFIX}/docs"
+    REDOC_URL: str | None = f"{API_PREFIX}/redoc"
     OPENAPI_URL: str | None = "/openapi.json"
     ALGORITHM: str = "HS256"
 
