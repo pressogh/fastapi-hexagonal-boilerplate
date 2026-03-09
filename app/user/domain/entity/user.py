@@ -41,4 +41,3 @@ class User(Entity):
 
     def delete(self) -> None:
         self.is_deleted = True
-        self.status = UserStatus.BLOCKED

@@ -1,5 +1,5 @@
 from app.user.application.dto.request import CreateUserRequest
-from app.user.application.exceptions.user import UserEmailAlreadyExistsException
+from app.user.application.exceptions.user import UserEmailAlreadyExistsException, UserNameAlreadyExistsException
 from app.user.domain.entity.user import Profile, User
 from app.user.domain.repository.user import UserRepository
 from core.db.transactional import transactional
@@ -12,6 +12,10 @@ class UserService:
 
     @transactional
     async def create_user(self, request: CreateUserRequest) -> User:
+        existing_user = await self.user_repo.get_by_username(request.username)
+        if existing_user:
+            raise UserNameAlreadyExistsException()
+
         existing_user = await self.user_repo.get_by_email(request.email)
         if existing_user:
             raise UserEmailAlreadyExistsException()
