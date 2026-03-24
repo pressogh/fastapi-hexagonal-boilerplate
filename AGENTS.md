@@ -66,17 +66,20 @@ This file is for coding agents working in `backend/`.
 
 ## Architecture Conventions
 - Preserve the layered structure already in use:
-  - `app/<domain>/domain/` for entities and repository interfaces
-  - `app/<domain>/application/` for command/result DTOs, services, and app exceptions
+  - `app/<domain>/domain/` for commands, entities, repository interfaces, and use case interfaces
+  - `app/<domain>/application/` for services, DTOs, and app exceptions
   - `app/<domain>/adapter/` for API and persistence adapters
   - `core/` for shared config, DB, framework, and helpers
 - Keep routers thin and business rules in application services
 - Depend on repository abstractions from services, not directly on SQLAlchemy internals
 - Keep persistence adapters in adapter/output modules, not in services or routers
 - Prefer this boundary for new API work:
-  - `adapter/input/api/v1/request.py` for HTTP request models
-  - `application/dto/command.py` for service input models
-  - `adapter/input/api/v1/response.py` for HTTP response models
+  - `adapter/input/api/v1/request/__init__.py` for HTTP request models
+  - `domain/command/__init__.py` for use-case command models
+  - `domain/usecase/*.py` for use-case interfaces
+  - `adapter/input/api/v1/response/__init__.py` for HTTP response models
+  - `adapter/output/persistence/repository_adapter.py` for application-facing persistence adapter wrappers
+  - `adapter/output/persistence/sqlalchemy/*.py` for concrete SQLAlchemy repositories
   - `application/dto/result.py` only when a non-HTTP use-case output model is actually needed
 
 ## Imports
@@ -107,9 +110,10 @@ This file is for coding agents working in `backend/`.
 - Functions, methods, and variables use snake_case
 - Tests use `test_*.py` files and `test_<behavior>` functions
 - API request models use `...Request`, for example `CreateUserRequest`
-- Application input DTOs use `...Command`, for example `UpdateUserCommand`
+- Domain command models use `...Command`, for example `UpdateUserCommand`
 - API response payload models use `...Payload`, for example `UserPayload`
 - API response envelope models use `...Response` and `...ListResponse`, for example `UserResponse` and `UserListResponse`
+- Use case interfaces use `...UseCase`, for example `UserUseCase`
 - Exception classes end with `Exception`
 - Repository interfaces are noun-based, such as `UserRepository`
 
@@ -117,8 +121,9 @@ This file is for coding agents working in `backend/`.
 - Define routes under adapter input modules such as `app/.../adapter/input/api/v1/`
 - Use `APIRouter` with explicit `prefix` and `tags`
 - Wire dependencies with `Depends(Provide[...])`
-- Keep HTTP request/response Pydantic models in the API adapter layer, for example `request.py` and `response.py`
-- Keep application-layer inputs as command/result DTOs when the service should not depend on FastAPI-facing schemas
+- Keep HTTP request/response Pydantic models in the API adapter layer, for example `request/__init__.py` and `response/__init__.py`
+- Keep command models in `domain/command/` and pass them from routers to use cases/services
+- Type router dependencies with domain use case interfaces when possible
 - Keep path params strongly typed, for example `user_id: UUID`
 - In typical CRUD flows, convert `Request -> Command` in the router and pass commands to the service
 - In typical CRUD flows, build response payloads directly in the router when mapping is simple and local
@@ -136,17 +141,23 @@ This file is for coding agents working in `backend/`.
 
 ## Current API Pattern
 - The current preferred pattern is:
-  - request schema in `adapter/input/api/v1/request.py`
-  - command DTO in `application/dto/command.py`
-  - response payload and envelopes in `adapter/input/api/v1/response.py`
+  - request schema in `adapter/input/api/v1/request/__init__.py`
+  - command model in `domain/command/__init__.py`
+  - use case interface in `domain/usecase/*.py`
+  - response payload and envelopes in `adapter/input/api/v1/response/__init__.py`
+  - service implementation in `application/service/*.py`
+  - repository adapter in `adapter/output/persistence/repository_adapter.py`
+  - concrete persistence in `adapter/output/persistence/sqlalchemy/*.py`
   - service returns domain entities unless a dedicated result model is justified
 - A representative naming set is:
   - `CreateUserRequest`, `UpdateUserRequest`
   - `CreateUserCommand`, `UpdateUserCommand`
+  - `UserUseCase`
   - `UserPayload`
   - `UserResponse`, `UserListResponse`
+- Do not place command models in `application/dto/command.py`
 - Do not place HTTP response models in `application/dto/response.py`
-- Do not place FastAPI request models in `application/dto/request.py`
+- Do not place FastAPI request models outside the adapter input layer
 - Add `result.py` only if multiple adapters share the same read model or the service should stop returning entities
 
 ## Domain And Service Conventions

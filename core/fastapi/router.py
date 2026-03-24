@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.file.adapter.input.api.v1.file import router as file_router
 from app.user.adapter.input.api.v1.user import router as user_router
 from core.config import config
 from core.fastapi import ExtendedFastAPI
@@ -12,5 +13,6 @@ def register_routers(app: ExtendedFastAPI):
     async def healthz():
         return {"status": "ok"}
 
+    api_router.include_router(file_router)
     api_router.include_router(user_router)
     app.include_router(api_router)

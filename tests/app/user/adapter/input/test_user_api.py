@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from app.user.application.exceptions.user import (
+from app.user.application.exception import (
     UserEmailAlreadyExistsException,
     UserNameAlreadyExistsException,
     UserNotFoundException,
@@ -149,7 +149,7 @@ def test_create_user_duplicate_username_returns_400(client, monkeypatch):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 409
     assert response.json()["error_code"] == "USER__USERNAME_ALREADY_EXISTS"
 
 
@@ -171,7 +171,7 @@ def test_create_user_duplicate_email_returns_400(client, monkeypatch):
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 409
     assert response.json()["error_code"] == "USER__EMAIL_ALREADY_EXISTS"
 
 

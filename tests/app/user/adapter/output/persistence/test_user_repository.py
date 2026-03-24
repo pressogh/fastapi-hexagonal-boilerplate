@@ -5,7 +5,9 @@ import pytest_asyncio
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.user.adapter.output.persistence.repository import UserPersistenceAdapter
+from app.user.adapter.output.persistence.sqlalchemy.user import (
+    UserSQLAlchemyRepository,
+)
 from app.user.domain.entity.user import Profile, User
 from core.config import config
 from core.db.session import session, session_context
@@ -45,9 +47,14 @@ async def db_session():
 
 @pytest.mark.asyncio
 async def test_save_and_get_user(db_session):
-    adapter = UserPersistenceAdapter()
+    adapter = UserSQLAlchemyRepository()
     profile = Profile(nickname="repo_test", real_name="리포테스트")
-    user = User(username="repo_user", password="hashed_password", email="repo@example.com", profile=profile)
+    user = User(
+        username="repo_user",
+        password="hashed_password",
+        email="repo@example.com",
+        profile=profile,
+    )
     await adapter.save(user)
     await db_session.commit()
 

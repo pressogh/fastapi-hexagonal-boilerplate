@@ -12,12 +12,9 @@ from app.user.adapter.input.api.v1.response import (
     UserPayload,
     UserResponse,
 )
-from app.user.application.dto.command import (
-    CreateUserCommand,
-    UpdateUserCommand,
-)
-from app.user.application.service.user import UserService
 from app.user.container import UserContainer
+from app.user.domain.command import CreateUserCommand, UpdateUserCommand
+from app.user.domain.usecase.user import UserUseCase
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -26,9 +23,9 @@ router = APIRouter(prefix="/users", tags=["users"])
 @inject
 async def create_user(
     request: CreateUserRequest,
-    service: UserService = Depends(Provide[UserContainer.service]),
+    usecase: UserUseCase = Depends(Provide[UserContainer.service]),
 ):
-    user = await service.create_user(CreateUserCommand(**request.model_dump()))
+    user = await usecase.create_user(CreateUserCommand(**request.model_dump()))
     return UserResponse(
         data=UserPayload(
             id=str(user.id),
@@ -45,9 +42,9 @@ async def create_user(
 @router.get("", response_model=UserListResponse)
 @inject
 async def list_users(
-    service: UserService = Depends(Provide[UserContainer.service]),
+    usecase: UserUseCase = Depends(Provide[UserContainer.service]),
 ):
-    users = await service.list_users()
+    users = await usecase.list_users()
     return UserListResponse(
         data=[
             UserPayload(
@@ -68,9 +65,9 @@ async def list_users(
 @inject
 async def get_user(
     user_id: UUID,
-    service: UserService = Depends(Provide[UserContainer.service]),
+    usecase: UserUseCase = Depends(Provide[UserContainer.service]),
 ):
-    user = await service.get_user(user_id)
+    user = await usecase.get_user(user_id)
     return UserResponse(
         data=UserPayload(
             id=str(user.id),
@@ -89,9 +86,9 @@ async def get_user(
 async def update_user(
     user_id: UUID,
     request: UpdateUserRequest,
-    service: UserService = Depends(Provide[UserContainer.service]),
+    usecase: UserUseCase = Depends(Provide[UserContainer.service]),
 ):
-    user = await service.update_user(
+    user = await usecase.update_user(
         user_id,
         UpdateUserCommand(**request.model_dump(exclude_unset=True)),
     )
@@ -112,9 +109,9 @@ async def update_user(
 @inject
 async def delete_user(
     user_id: UUID,
-    service: UserService = Depends(Provide[UserContainer.service]),
+    usecase: UserUseCase = Depends(Provide[UserContainer.service]),
 ):
-    user = await service.delete_user(user_id)
+    user = await usecase.delete_user(user_id)
     return UserResponse(
         data=UserPayload(
             id=str(user.id),
