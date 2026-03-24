@@ -33,7 +33,7 @@ jobs:
         run: uv sync
 
       - name: Run Ruff Check
-        run: uv run ruff check .
+        run: uv run ruff check --output-format=github .
 
       - name: Run Ruff Format Check
         run: uv run ruff format --check .
@@ -92,4 +92,71 @@ jobs:
         run: uv run python -c "from main import create_app; create_app()"
 
       - name: Run Tests
-        run: uv run pytest
+        run: |
+          set +e
+          uv run pytest --junitxml=pytest.xml
+          pytest_exit_code=$?
+
+          python - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          report_path = Path("pytest.xml")
+
+          lines = ["## Pytest Summary", ""]
+
+          if report_path.exists():
+              root = ET.parse(report_path).getroot()
+              suite = root if root.tag == "testsuite" else root.find("testsuite")
+
+              if suite is not None:
+                  tests = int(suite.attrib.get("tests", 0))
+                  failures = int(suite.attrib.get("failures", 0))
+                  errors = int(suite.attrib.get("errors", 0))
+                  skipped = int(suite.attrib.get("skipped", 0))
+                  passed = tests - failures - errors - skipped
+
+                  lines.extend(
+                      [
+                          f"- Passed: {passed}",
+                          f"- Failed: {failures}",
+                          f"- Errors: {errors}",
+                          f"- Skipped: {skipped}",
+                          f"- Total: {tests}",
+                      ]
+                  )
+
+                  failed_cases: list[str] = []
+                  for case in suite.iter("testcase"):
+                      if case.find("failure") is None and case.find("error") is None:
+                          continue
+
+                      classname = case.attrib.get("classname", "")
+                      name = case.attrib.get("name", "")
+                      if classname:
+                          failed_cases.append(f"{classname}::{name}")
+                      else:
+                          failed_cases.append(name)
+
+                  if failed_cases:
+                      lines.extend(["", "### Failed Tests"])
+                      lines.extend(
+                          f"- `{case}`" for case in failed_cases[:20]
+                      )
+
+                      if len(failed_cases) > 20:
+                          lines.append(
+                              f"- ... and {len(failed_cases) - 20} more"
+                          )
+              else:
+                  lines.append("- Could not parse pytest results.")
+          else:
+              lines.append("- No pytest report generated.")
+
+          with summary_path.open("a", encoding="utf-8") as summary_file:
+              summary_file.write("\n".join(lines) + "\n")
+          PY
+
+          exit $pytest_exit_code
