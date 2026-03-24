@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.auth.adapter.input.api.v1.auth import router as auth_router
 from app.file.adapter.input.api.v1.file import router as file_router
 from app.user.adapter.input.api.v1.user import router as user_router
 from core.config import config
@@ -13,6 +14,7 @@ def register_routers(app: ExtendedFastAPI):
     async def healthz():
         return {"status": "ok"}
 
+    api_router.include_router(auth_router)
     api_router.include_router(file_router)
     api_router.include_router(user_router)
     app.include_router(api_router)

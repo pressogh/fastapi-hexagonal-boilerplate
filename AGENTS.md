@@ -46,11 +46,19 @@ This file is for coding agents working in `backend/`.
 - Async tests use `asyncio_mode = auto`
 - CI starts PostgreSQL and Valkey before `uv run pytest`
 - Useful env for integration-style tests:
-  - `DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/test_db`
+  - `DATABASE_URL=postgresql+asyncpg://postgres:password@127.0.0.1:55432/test_db`
   - `VALKEY_URL=redis://localhost:6379/0`
   - `ENVIRONMENT=test`
 - Repository tests and some startup flows likely need those services
 - Many service and API tests can stay isolated with in-memory fakes or monkeypatching
+- Local Docker Compose is available for test dependencies:
+  - Start services: `docker compose up -d`
+  - Check health: `docker compose ps`
+  - Stop and remove volumes: `docker compose down -v`
+  - PostgreSQL is exposed on `127.0.0.1:55432`
+  - Valkey is exposed on `127.0.0.1:6379`
+- Before DB-backed test runs, apply migrations with the test env vars set:
+  - `ENVIRONMENT=test DATABASE_URL=postgresql+asyncpg://postgres:password@127.0.0.1:55432/test_db VALKEY_URL=redis://127.0.0.1:6379/0 uv run alembic upgrade head`
 
 ## Alembic And Data Layer Commands
 - Upgrade DB: `uv run alembic upgrade head`

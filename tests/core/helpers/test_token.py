@@ -12,7 +12,11 @@ def test_create_and_decode_token():
     expires_in = 60
 
     # When
-    token = TokenHelper.create_token(payload=payload, token_type=token_type, expires_delta=expires_in)
+    token = TokenHelper.create_token(
+        payload=payload,
+        token_type=token_type,
+        expires_delta=expires_in,
+    )
     decoded = TokenHelper.decode_token(token)
 
     # Then
@@ -28,7 +32,11 @@ def test_refresh_token_creation_with_minutes():
     expires_in = 10080  # 7 days in minutes
 
     # When
-    token = TokenHelper.create_token(payload=payload, token_type=token_type, expires_delta=expires_in)
+    token = TokenHelper.create_token(
+        payload=payload,
+        token_type=token_type,
+        expires_delta=expires_in,
+    )
     decoded = TokenHelper.decode_token(token)
 
     # Then
