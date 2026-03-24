@@ -52,7 +52,9 @@ class PageParams(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     page: int = Field(1, description="페이지 번호", ge=1, examples=[1])
-    count_by_page: int = Field(12, description="페이지 당 조회 개수", ge=1, le=100, examples=[10])
+    count_by_page: int = Field(
+        12, description="페이지 당 조회 개수", ge=1, le=100, examples=[10]
+    )
 
     def to_prev_limit(self) -> namedtuple("PrevLimit", ["prev", "limit"]):
         return (self.page - 1) * self.count_by_page, self.count_by_page

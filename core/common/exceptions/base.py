@@ -5,11 +5,11 @@ class CustomException(Exception):
     detail = None
 
     def __init__(
-            self,
-            code: int | None = None,
-            message: str | None = None,
-            *,
-            detail: dict | str | None = None
+        self,
+        code: int | None = None,
+        message: str | None = None,
+        *,
+        detail: dict | str | None = None,
     ):
         if code:
             self.code = code

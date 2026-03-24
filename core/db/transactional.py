@@ -9,9 +9,6 @@ from core.db.session import session
 def transactional(func):
     @wraps(func)
     async def _transactional(*args, **kwargs):
-        # NOTE: async_scoped_session does not expose in_transaction(); treat this decorator
-        # as the outer transaction boundary.
-
         @stamina.retry(
             on=StaleDataError,
             attempts=3,

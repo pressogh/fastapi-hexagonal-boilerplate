@@ -21,16 +21,16 @@ def register_exception_handlers(app: ExtendedFastAPI):
         )
 
     @app.exception_handler(RequestValidationError)
-    async def request_validation_exception_handler(_: Request, exc: RequestValidationError):
+    async def request_validation_exception_handler(
+        _: Request, exc: RequestValidationError
+    ):
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            content=jsonable_encoder(
-                {
-                    "error_code": "SERVER__REQUEST_VALIDATION_ERROR",
-                    "message": "요청값 검증 오류가 발생했습니다.",
-                    "detail": exc.errors(),
-                }
-            ),
+            content=jsonable_encoder({
+                "error_code": "SERVER__REQUEST_VALIDATION_ERROR",
+                "message": "요청값 검증 오류가 발생했습니다.",
+                "detail": exc.errors(),
+            }),
         )
 
 

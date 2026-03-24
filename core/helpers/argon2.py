@@ -22,5 +22,4 @@ class Argon2Helper:
         except VerifyMismatchError:
             return False
         except Exception as e:
-            # Re-raise for malformed hashes or other critical errors to be caught by tests/apps
             raise e

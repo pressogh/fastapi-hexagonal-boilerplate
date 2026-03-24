@@ -8,7 +8,10 @@ class LocalSettings(CommonSettings):
     PROFILING_ENABLED: bool = True
     SQLALCHEMY_ECHO: bool = True
 
-    FRONTEND_CORS_ORIGIN: list[str] = ["http://localhost:3000", "http://localhost:3001"]
+    FRONTEND_CORS_ORIGIN: list[str] = [
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ]
 
     LOG_LEVEL: LogLevel = "DEBUG"
     LOG_FORMAT: LogFormat = "uvicorn"

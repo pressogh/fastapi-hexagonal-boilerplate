@@ -13,8 +13,12 @@ class Base(DeclarativeBase):
 class TimestampMixin:
     """Mixin to add created_at and updated_at columns."""
 
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
 
 class OptimisticLockMixin:

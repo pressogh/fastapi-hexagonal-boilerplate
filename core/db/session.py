@@ -9,7 +9,9 @@ from sqlalchemy.ext.asyncio import (
 
 from core.config import config
 
-session_context: ContextVar[str] = ContextVar("session_context", default="global")
+session_context: ContextVar[str] = ContextVar(
+    "session_context", default="global"
+)
 
 
 def get_session_context() -> str:
@@ -22,6 +24,7 @@ async_session_factory = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
+
 
 session = async_scoped_session(
     session_factory=async_session_factory,
